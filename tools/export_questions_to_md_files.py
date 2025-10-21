@@ -4,9 +4,11 @@ import re
 
 # === Configuration ===
 API_URL = "https://community.simplicite.io/admin/plugins/explorer/queries/8/run"
-API_KEY = input("Please enter your API key: ")  # ask the user
+API_KEY = os.getenv("COMMUNITY_API_KEY")
+if not API_KEY:
+    API_KEY = input("Please enter your API key: ")  # fallback to user input
 API_USERNAME = "system"
-OUTPUT_DIR = "/Users/alistairwheeler/community-solved-topics"
+OUTPUT_DIR = "../topics"
 
 # === Functions ===
 
