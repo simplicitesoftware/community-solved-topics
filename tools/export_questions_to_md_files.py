@@ -22,14 +22,18 @@ def fetch_data():
         raise Exception(f"Failed to fetch data. Status code: {response.status_code}\n{response.text}")
     return response.json()
 
-def slugify(title):
-    return re.sub(r'[^\w\-]+', '_', title.strip().lower())[:100]
+def slugify(title, fallback_id=None):
+    if not title or not str(title).strip():
+        return f"topic_{fallback_id}" if fallback_id is not None else "untitled"
+    return re.sub(r'[^\w\-]+', '_', str(title).strip().lower())[:100]
 
 def sanitize_markdown(text):
-    return text.strip()
+    if text is None:
+        return ""
+    return str(text).strip()
 
 def save_markdown_file(id, title, question, answer):
-    filename = slugify(title) + ".md"
+    filename = slugify(title, fallback_id=id) + ".md"
     filepath = os.path.join(OUTPUT_DIR, filename)
     
     # Create URL by concatenating base URL with ID
@@ -39,7 +43,8 @@ def save_markdown_file(id, title, question, answer):
         f.write(f"# {title}\n\n")
         f.write(f"**URL:** {url}\n\n")
         f.write(f"## Question\n{sanitize_markdown(question)}\n\n")
-        f.write(f"## Answer\n{sanitize_markdown(answer)}\n")
+        answer_text = sanitize_markdown(answer) or "_No answer provided._"
+        f.write(f"## Answer\n{answer_text}\n")
     
     print(f"✅ Created: {filepath}")
 
